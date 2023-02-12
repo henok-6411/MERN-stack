@@ -1,5 +1,4 @@
 require('dotenv').config();
-const router = require('./routers/goalRouts');
 const express = require('express');
 const errorHandler = require('./middleware/errorMiddleware');
 const connectDb = require('./config/db');
@@ -10,7 +9,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-app.use('/api/goals', router);
+app.use('/api/goals', require('./routers/goalRouts'));
+app.use('/api/users',require('./routers/userRouts'))
 app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`server is up and listening on port no ${PORT}`);
