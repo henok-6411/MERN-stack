@@ -1,12 +1,14 @@
 const asyncHandler = require('express-async-handler');
 const Goal = require('../model/goalSchema');
+const User = require('../model/userSchema');
+//const protocol = require('../middleware/authMiddleWare');
 
 //@description Get all goals
 //@route GET '/api/goals'
 //@privacy Private
 
 const getGoal = asyncHandler(async (req, res) => {
-  const goals = await  Goal.find()
+  const goals = await  Goal.find({user:req.user.id})
   if (!goals) {
     res.status(400)
     throw new Error('wrong request');
@@ -19,7 +21,8 @@ const getGoal = asyncHandler(async (req, res) => {
 //@privacy Private
 const setGoal = asyncHandler(async (req, res) => {
   const goals = await Goal.create({
-    text:req.body.text
+    text: req.body.text,
+    user:req.user.id,
   });
   if (!goals) {
     res.status(400)
@@ -36,6 +39,11 @@ const updateGoal = asyncHandler(async (req, res) => {
   if (!goals) {
     res.status(400);
     throw new Error('wrong request');
+  }
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    res.status(401);
+    throw new Error('User not found or authorized')
   }
   const updatedGoals = await Goal.findByIdAndUpdate( req.params.id, req.body , { new:true});
   res.send(updatedGoals);

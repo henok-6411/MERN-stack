@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
-     name: {
+     fname: {
+          type: String,
+          require: [true, 'write users login info']
+     },
+     lname: {
           type: String,
           require: [true, 'write users login info']
      },
@@ -17,4 +21,4 @@ const userSchema = mongoose.Schema({
      timestamps:true
 })
 
-module.exports = mongoose.model('Users', userSchema);
+module.exports = mongoose.model('User', userSchema);
