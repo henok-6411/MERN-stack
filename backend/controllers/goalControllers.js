@@ -58,6 +58,11 @@ const deleteGoal = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('request not found')
   }
+   const user = await User.findById(req.user.id);
+  if (!user) {
+    res.status(401);
+    throw new Error('User not found or authorized')
+  }
   const deletedGoal = await Goal.findByIdAndDelete(goals)
   res.send(deletedGoal)
 
