@@ -1,16 +1,50 @@
 import { FaSignInAlt } from 'react-icons/fa'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { logIn, reset } from '../features/auth/authSlice'
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'
+import Spinner from '../components/Spinner'
+
+
 const LogIn = () => {
-     const [userData, setUserData] = useState({
+     const [userInfo, setUserInfo] = useState({
           email: '',
           password: '',
      })
+     const { email, password } = userInfo;
+     const dispatch = useDispatch()
+     const navigate = useNavigate()
+     const { user, isLoading, isError, isSuccess, message } = useSelector((state) => state.auth)
+
+     useEffect(() => {
+          if (isError) {
+               toast.error(message)
+          }
+          if (isSuccess || user) {
+               navigate('/')
+          }
+          dispatch(reset())
+     }, [user, isError, isSuccess, message, navigate, dispatch])
      const changeHandler = (e) => {
           e.preventDefault();
-          setUserData({
-               ...userData,
+
+          setUserInfo({
+               ...userInfo,
                [e.target.name]: e.target.value
           })
+     }
+
+     const onSubmit = (e) => {
+          e.preventDefault()
+          const userData = {
+               email,
+               password
+          }
+          dispatch(logIn(userData))
+     }
+     if (isLoading) {
+          return <Spinner />
      }
      return (
           <div>
@@ -21,13 +55,13 @@ const LogIn = () => {
                     <p>Login and start setting goals!</p>
                </section>
                <section className='form'>
-                    <form>
+                    <form onSubmit={onSubmit}>
                          <div className='form-group'>
                               <input
                                    type="email"
                                    className='form-control'
                                    name='email'
-                                   value={userData.email}
+                                   value={userInfo.email}
                                    placeholder="email.."
                                    onChange={changeHandler}
                               />
@@ -37,7 +71,7 @@ const LogIn = () => {
                                    type="password"
                                    className='form-control'
                                    name='password'
-                                   value={userData.password}
+                                   value={userInfo.password}
                                    placeholder="Password.."
                                    onChange={changeHandler}
                               />

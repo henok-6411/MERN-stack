@@ -1,6 +1,14 @@
 import { FaUser } from 'react-icons/fa'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'
+import { registerUser, reset } from '../features/auth/authSlice'
+import Spinner from '../components/Spinner';
+
+
 const Register = () => {
+
      const [userData, setUserData] = useState({
           fname: '',
           lname: '',
@@ -8,12 +16,46 @@ const Register = () => {
           password: '',
           password2: ''
      })
+     const { user, isLoading, isError, isSuccess, message } = useSelector((state) => state.auth)
+     const navigate = useNavigate();
+     const dispatch = useDispatch();
+
+
+
      const changeHandler = (e) => {
           e.preventDefault();
           setUserData({
                ...userData,
                [e.target.name]: e.target.value
           })
+     }
+     useEffect(() => {
+          if (isError) {
+               toast.error(message)
+          }
+          if (isSuccess) {
+               navigate('/')
+          }
+          dispatch(reset())
+     }, [user, isError, isSuccess, message, navigate, dispatch])
+
+     const formSubmitHandler = (e) => {
+          e.preventDefault()
+          const { fname, lname, email, password } = userData
+          if (userData.password !== userData.password2) {
+               toast.error('password should match')
+          } else {
+               const userData = {
+                    fname,
+                    lname,
+                    email,
+                    password,
+               }
+               dispatch(registerUser(userData))
+          }
+     }
+     if (isLoading) {
+          return <Spinner />
      }
      return (
           <div>
@@ -24,7 +66,7 @@ const Register = () => {
                     <p>Please create an account</p>
                </section>
                <section className='form'>
-                    <form>
+                    <form onSubmit={formSubmitHandler}>
                          <div className='form-group'>
                               <input
                                    type="text"

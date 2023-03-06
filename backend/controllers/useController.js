@@ -13,7 +13,7 @@ const registerUser = asyncHandler(async (req, res) => {
           res.status(400);
           throw new Error('complite the required fields');
      }
-     const existedUser = await User.findOne({ email });
+     const existedUser = await User.findOne({ email },{ timeout: false });
      if (existedUser) {
           res.status(400);
           throw new Error('The email address you provided did exista')
@@ -46,7 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const logInUser = asyncHandler(async (req, res) => {
      const { email, password } = req.body;
 
-     const user = await User.findOne({ email });
+     const user = await User.findOne({ email },{ timeout: false });
 
      const deCodePassWord = await bcrypt.compare(password, user.password)
      
